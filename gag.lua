@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 
 -- Konfigurasi daftar seed
-local SEED_LIST = {"Tomato", "Carrot", "Lettuce", "Apple", "Coconut", "Peach", "Beanstalk", "Moon Melon", "Blood Banana", "Dragon Fruit"}
+local SEED_LIST = {"Tomato", "Carrot", "Grape", "Apple", "Coconut", "Peach", "Beanstalk", "Moon Melon", "Blood Banana", "Dragon Fruit"}
 
 -- Variabel state
 local selectedSeeds = {}
@@ -79,9 +79,15 @@ task.spawn(function()
 				continue
 			end
 
-			local updateItems = shopFolder:FindFirstChild("Updateltems")
+			-- Tambahkan debug isi folder
+			for _, obj in ipairs(shopFolder:GetChildren()) do
+				print("[DEBUG] Folder in Interaction:", obj.Name)
+			end
+
+			-- Cari updateItems (coba dua kemungkinan penulisan)
+			local updateItems = shopFolder:FindFirstChild("UpdateItems") or shopFolder:FindFirstChild("Updateltems")
 			if not updateItems then
-				warn("[AUTO BUY] ❌ Updateltems not found")
+				warn("[AUTO BUY] ❌ UpdateItems folder not found")
 				task.wait(5)
 				continue
 			end
