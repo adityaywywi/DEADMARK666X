@@ -1,4 +1,4 @@
---==[ DEADMARK ESP + UI ]==--
+--==[ DEADMARK ESP + UI FIXED v2 ]==--
 
 local EggContents = {
     ["Pet Egg"] = {"Bunny", "Dog", "Golden Lab"},
@@ -12,25 +12,34 @@ local EggContents = {
     ["Night Egg"] = {"Hedgehog", "Kiwi", "Mole", "Echo Frog", "Night Owl"}
 }
 
+-- Fungsi buat ESP
 local function createESP(egg)
-    if egg:IsA("BasePart") and EggContents[egg.Name] and not egg:FindFirstChild("ESPLabel") then
-        local gui = Instance.new("BillboardGui", egg)
-        gui.Name = "ESPLabel"
-        gui.Adornee = egg
-        gui.Size = UDim2.new(0, 200, 0, 40)
-        gui.StudsOffset = Vector3.new(0, 2.5, 0)
-        gui.AlwaysOnTop = true
+    if not egg:IsA("BasePart") then return end
+    local nameLower = egg.Name:lower()
 
-        local label = Instance.new("TextLabel", gui)
-        label.Size = UDim2.new(1, 0, 1, 0)
-        label.BackgroundTransparency = 1
-        label.TextColor3 = Color3.fromRGB(0, 255, 0)
-        label.TextScaled = true
-        label.Font = Enum.Font.SourceSansBold
-        label.Text = table.concat(EggContents[egg.Name], ", ")
+    for known, pets in pairs(EggContents) do
+        if nameLower == known:lower() and not egg:FindFirstChild("ESPLabel") then
+            local gui = Instance.new("BillboardGui", egg)
+            gui.Name = "ESPLabel"
+            gui.Adornee = egg
+            gui.Size = UDim2.new(0, 200, 0, 40)
+            gui.StudsOffset = Vector3.new(0, 2.5, 0)
+            gui.AlwaysOnTop = true
+
+            local label = Instance.new("TextLabel", gui)
+            label.Size = UDim2.new(1, 0, 1, 0)
+            label.BackgroundTransparency = 1
+            label.TextColor3 = Color3.fromRGB(0, 255, 0)
+            label.TextScaled = true
+            label.Font = Enum.Font.SourceSansBold
+            label.Text = table.concat(pets, ", ")
+
+            print("ESP Loaded for:", egg.Name)
+        end
     end
 end
 
+-- Remove ESP
 local function removeESP()
     for _, v in pairs(workspace:GetDescendants()) do
         if v:IsA("BasePart") and v:FindFirstChild("ESPLabel") then
@@ -75,7 +84,7 @@ DisableBtn.TextColor3 = Color3.new(1, 1, 1)
 DisableBtn.Font = Enum.Font.SourceSansBold
 DisableBtn.TextScaled = true
 
--- Logic Tombol
+-- Tombol kerja
 EnableBtn.MouseButton1Click:Connect(function()
     for _, egg in pairs(workspace:GetDescendants()) do
         createESP(egg)
@@ -86,3 +95,8 @@ EnableBtn.MouseButton1Click:Connect(function()
 end)
 
 DisableBtn.MouseButton1Click:Connect(removeESP)
+
+-- Scan awal langsung saat load
+for _, egg in pairs(workspace:GetDescendants()) do
+    createESP(egg)
+end
