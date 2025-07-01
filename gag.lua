@@ -1,122 +1,65 @@
--- ✅ ESP + Auto Farm GROW A GARDEN - Only Your Eggs
+-- ✅ GROW A GARDEN - DEADMARK666X FULL SCRIPT
 
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
-local ESP_COLOR = Color3.fromRGB(255, 255, 0)
-local TEXT_SIZE = 14
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-local function createESP(part, text)
-    if part:FindFirstChild("PetESP") then return end
+-- === CONFIG ===
+local summerFruits = { "Watermelon", "Mango", "Pineapple", "Lime" }
 
-    local billboard = Instance.new("BillboardGui")
-    billboard.Name = "PetESP"
-    billboard.Size = UDim2.new(0, 200, 0, 30)
-    billboard.Adornee = part
-    billboard.AlwaysOnTop = true
-    billboard.StudsOffset = Vector3.new(0, 3, 0)
+-- === FUNCTIONS ===
 
-    local label = Instance.new("TextLabel", billboard)
-    label.Size = UDim2.new(1, 0, 1, 0)
-    label.BackgroundTransparency = 1
-    label.Text = text
-    label.TextColor3 = ESP_COLOR
-    label.Font = Enum.Font.SourceSansBold
-    label.TextSize = TEXT_SIZE
-    label.TextStrokeTransparency = 0.5
-
-    billboard.Parent = part
-end
-
-local function getPetName(model)
-    for _, child in ipairs(model:GetChildren()) do
-        if child:IsA("Model") and not child.Name:find("HitBox") then
-            return child.Name
-        end
-    end
-    return model:GetAttribute("EggName") or "PetEgg"
-end
-
-local function scanEggs()
-    for _, egg in ipairs(workspace:GetDescendants()) do
-        if egg:IsA("Model") and egg:GetAttribute("OBJECT_TYPE") == "PetEgg" and egg:GetAttribute("OWNER") == LocalPlayer.Name then
-            local part = egg:FindFirstChildWhichIsA("BasePart")
-            if part and not part:FindFirstChild("PetESP") then
-                local name = getPetName(egg)
-                createESP(part, name)
-                print("[ESP] Loaded: " .. name)
-            end
-        end
-    end
-end
-
--- AUTO FEATURES
-local autoCollect, autoSeed, autoSubmit = false, false, false
-
+-- 🔁 Auto-buy Seed
 task.spawn(function()
     while true do
-        if autoCollect then
-            game:GetService("ReplicatedStorage").RemoteEvent:FireServer("CollectAll")
+        local inv = LocalPlayer:FindFirstChild("Backpack") or LocalPlayer:FindFirstChild("backpack")
+        local hasSeed = false
+
+        if inv then
+            for _, item in ipairs(inv:GetChildren()) do
+                if item.Name:lower():find("seed") then
+                    hasSeed = true
+                    break
+                end
+            end
+        end
+
+        if not hasSeed then
+            local buySeed = ReplicatedStorage:FindFirstChild("BuySeed")
+            if buySeed then
+                buySeed:FireServer()
+                warn("[AUTO SEED] Seed purchased.")
+            end
         end
         task.wait(3)
     end
 end)
 
+-- 🍓 Auto Collect Fruits
 task.spawn(function()
     while true do
-        if autoSeed then
-            game:GetService("ReplicatedStorage").RemoteEvent:FireServer("BuySeed", "Tomato")
+        local collectEvent = ReplicatedStorage:FindFirstChild("CollectAll")
+        if collectEvent then
+            collectEvent:FireServer()
+            warn("[AUTO COLLECT] All fruits collected.")
         end
         task.wait(5)
     end
 end)
 
+-- ☀️ Auto Submit Summer Fruits
 task.spawn(function()
     while true do
-        if autoSubmit then
-            game:GetService("ReplicatedStorage").RemoteEvent:FireServer("SubmitFruit", "Summer")
+        local fruitFolder = LocalPlayer:FindFirstChild("Fruits")
+        if fruitFolder then
+            for _, fruit in ipairs(fruitFolder:GetChildren()) do
+                if table.find(summerFruits, fruit.Name) then
+                    ReplicatedStorage.SubmitFruit:FireServer(fruit)
+                    warn("[AUTO SUBMIT] Summer fruit submitted:", fruit.Name)
+                end
+            end
         end
-        task.wait(5)
+        task.wait(4)
     end
 end)
-
--- UI
-local ScreenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-ScreenGui.Name = "DM666XUI"
-
-local function createButton(name, pos, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 200, 0, 30)
-    btn.Position = UDim2.new(0, 10, 0, pos)
-    btn.Text = name
-    btn.BackgroundColor3 = Color3.new(0, 0, 0.2)
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.Parent = ScreenGui
-    btn.MouseButton1Click:Connect(callback)
-end
-
-createButton("Enable ESP", 10, function()
-    print("[DM666X] ESP Enabled")
-    task.spawn(function()
-        while true do
-            pcall(scanEggs)
-            task.wait(2.5)
-        end
-    end)
-end)
-
-createButton("Auto Collect", 50, function()
-    autoCollect = not autoCollect
-    print("[DM666X] Auto Collect:", autoCollect)
-end)
-
-createButton("Auto Buy Seed", 90, function()
-    autoSeed = not autoSeed
-    print("[DM666X] Auto Seed:", autoSeed)
-end)
-
-createButton("Auto Submit Summer", 130, function()
-    autoSubmit = not autoSubmit
-    print("[DM666X] Auto Submit:", autoSubmit)
-end)
-
-print("[DEADMARK666X] UI Loaded.")
