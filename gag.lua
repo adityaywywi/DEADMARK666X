@@ -76,29 +76,21 @@ end)
 task.spawn(function()
     while true do
         if autoBuy then
-            local shopFolder = workspace:FindFirstChild("Interaction")
-            local updateItems = shopFolder and shopFolder:FindFirstChild("Updateltems")
-            local harvestShop = updateItems and updateItems:FindFirstChild("HarvestShop")
-
-            local events = ReplicatedStorage:FindFirstChild("GameEvents")
-            local buyRemote = events and events:FindFirstChild("BuySeedStock")
-
-            if harvestShop and buyRemote then
-                for _, item in pairs(harvestShop:GetChildren()) do
+            local shop = findHarvestShop()
+            if shop then
+                for _, item in pairs(shop:GetChildren()) do
                     if selectedSeeds[item.Name] and item:FindFirstChild("Stock") and item.Stock.Value > 0 then
+                        print("[AUTO BUY] 🔁 Buying:", item.Name)
                         pcall(function()
-                            buyRemote:FireServer(item.Name, 1)
-                            warn("[✅ AUTO BUY] Buying:", item.Name)
+                            ReplicatedStorage.GameEvents.BuySeedStock:FireServer(item.Name, 1)
                         end)
-                        task.wait(0.4)
+                        task.wait(0.3)
                     end
                 end
             else
-                warn("[❌ AUTO BUY] HarvestShop or BuySeedStock not found!")
+                warn("❌ HarvestShop not found in game")
             end
         end
         task.wait(5)
     end
 end)
-
-warn("✅ UI loaded successfully!")
