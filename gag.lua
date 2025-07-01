@@ -24,7 +24,7 @@ title.Font = Enum.Font.SourceSansBold
 title.TextSize = 16
 
 -- Dropdown (manual input for now)
-local seedOptions = {"Tomato", "Carrot", "Lettuce", "Apple"} -- kamu bisa tambahkan seed lain
+local seedOptions = {"Tomato", "Carrot} -- Tambahkan seed sesuai kebutuhan
 for i, seedName in ipairs(seedOptions) do
 	local button = Instance.new("TextButton", Frame)
 	button.Size = UDim2.new(1, -20, 0, 25)
@@ -66,10 +66,10 @@ end)
 task.spawn(function()
 	while true do
 		if autoBuyEnabled then
-			local shop = workspace:FindFirstChild("Shop_Items") -- ganti jika folder berbeda
+			local shop = workspace:FindFirstChild("Interaction") and workspace.Interaction:FindFirstChild("Updateltems") and workspace.Interaction.Updateltems:FindFirstChild("HarvestShop")
 			if shop then
 				for _, item in ipairs(shop:GetChildren()) do
-					if seedsToBuy[item.Name] and item:FindFirstChild("Stock") and item.Stock.Value > 0 then
+					if seedsToBuy[item.Name] then
 						ReplicatedStorage.GameEvents.BuySeedStock:FireServer(item.Name, 1)
 						warn("[AUTO BUY] Bought seed:", item.Name)
 						task.wait(0.5)
