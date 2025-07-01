@@ -109,15 +109,14 @@ task.spawn(function()
 			local buyRemote = event.BuySeedStock
 
 			for _, item in pairs(harvestShop:GetChildren()) do
-				if selectedSeeds[item.Name] and item:FindFirstChild("Stock") and item.Stock.Value > 0 then
-					print("[AUTO BUY] 🔄 Buying:", item.Name)
-					pcall(function()
-						buyRemote:FireServer(item.Name, 1)
-					end)
-					task.wait(0.3)
-				end
-			end
+	local itemName = item.Name
+	for seedName in pairs(selectedSeeds) do
+		if itemName:lower():find(seedName:lower()) and item:FindFirstChild("Stock") and item.Stock.Value > 0 then
+			print("[AUTO BUY] 🔄 Buying:", itemName)
+			pcall(function()
+				buyRemote:FireServer(itemName, 1)
+			end)
+			break
 		end
-		task.wait(5)
 	end
-end)
+				end
