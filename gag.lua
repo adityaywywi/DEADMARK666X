@@ -1,3 +1,15 @@
+local gui = Instance.new("ScreenGui")
+gui.Name = "UI_Test"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local test = Instance.new("TextLabel", gui)
+test.Text = "Hello World"
+test.Size = UDim2.new(0, 200, 0, 50)
+test.Position = UDim2.new(0, 50, 0, 50)
+test.TextColor3 = Color3.new(1, 1, 1)
+
 -- ✅ MODERN AUTO-BUY UI DESIGN
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
