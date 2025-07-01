@@ -10,53 +10,43 @@ local EggContents = {
     ["Night Egg"] = {"Hedgehog", "Kiwi", "Mole", "Echo Frog", "Night Owl"}
 }
 
-local function createESP(obj)
-    if not obj:IsA("Part") then return end
-    if obj:FindFirstChild("ESPLabel") then
-        print("[SKIP] ESP already exists for:", obj.Name)
-        return
-    end
+local function createESPFromModel(model)
+    if not model:GetAttribute("EggName") then return end
+    if not model:GetAttribute("OBJECT_TYPE") == "PetEgg" then return end
 
-    local eggName = obj:GetAttribute("EggName") or (obj.Parent and obj.Parent:GetAttribute("EggName"))
+    local part = model:FindFirstChild("PetEgg")
+    if not part or not part:IsA("BasePart") then return end
+    if part:FindFirstChild("ESPLabel") then return end
 
-    print("[CHECK] Object:", obj.Name, " | EggName:", eggName)
-
-    if not eggName then
-        print("[SKIP] No EggName attribute.")
-        return
-    end
-
+    local eggName = model:GetAttribute("EggName")
     local pets = EggContents[eggName]
-    if not pets then
-        print("[SKIP] Unknown egg type:", eggName)
-        return
-    end
+    if not pets then return end
 
-    print("[ESP] Creating for:", eggName)
+    print("[ESP] Loaded:", eggName)
 
-    local gui = Instance.new("BillboardGui", obj)
+    local gui = Instance.new("BillboardGui", part)
     gui.Name = "ESPLabel"
-    gui.Adornee = obj
+    gui.Adornee = part
     gui.Size = UDim2.new(0, 200, 0, 40)
-    gui.StudsOffset = Vector3.new(0, 2.5, 0)
+    gui.StudsOffset = Vector3.new(0, 3, 0)
     gui.AlwaysOnTop = true
 
     local label = Instance.new("TextLabel", gui)
     label.Size = UDim2.new(1, 0, 1, 0)
-    label.BackgroundTransparency = 1
+    label.BackgroundTransparency = 0.3
+    label.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     label.TextColor3 = Color3.fromRGB(0, 255, 0)
     label.TextScaled = true
     label.Font = Enum.Font.SourceSansBold
     label.Text = table.concat(pets, ", ")
 end
 
-local function removeESP()
-    for _, v in pairs(workspace:GetDescendants()) do
-        if v:IsA("BasePart") and v:FindFirstChild("ESPLabel") then
-            v.ESPLabel:Destroy()
+local function scanAllEggs()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("Model") and obj:GetAttribute("OBJECT_TYPE") == "PetEgg" then
+            createESPFromModel(obj)
         end
     end
-    print("[ESP] All ESP removed.")
 end
 
 -- UI
@@ -67,7 +57,6 @@ local Frame = Instance.new("Frame", ScreenGui)
 Frame.Size = UDim2.new(0, 200, 0, 120)
 Frame.Position = UDim2.new(0.05, 0, 0.2, 0)
 Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Frame.BorderSizePixel = 0
 
 local Title = Instance.new("TextLabel", Frame)
 Title.Size = UDim2.new(1, 0, 0, 30)
@@ -96,17 +85,21 @@ DisableBtn.Font = Enum.Font.SourceSansBold
 DisableBtn.TextScaled = true
 
 EnableBtn.MouseButton1Click:Connect(function()
-    print("[UI] Enable clicked. Scanning workspace...")
-    for _, egg in pairs(workspace:GetDescendants()) do
-        createESP(egg)
-    end
+    print("[ESP] Scanning all eggs...")
+    scanAllEggs()
     workspace.DescendantAdded:Connect(function(obj)
-        createESP(obj)
+        if obj:IsA("Model") and obj:GetAttribute("OBJECT_TYPE") == "PetEgg" then
+            createESPFromModel(obj)
+        end
     end)
 end)
 
 DisableBtn.MouseButton1Click:Connect(function()
-    removeESP()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") and v:FindFirstChild("ESPLabel") then
+            v.ESPLabel:Destroy()
+        end
+    end
 end)
 
-print("[LOADED] DEADMARK ESP UI Loaded")
+print("[ESP] Script loaded.")
