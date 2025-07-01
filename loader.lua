@@ -10,31 +10,31 @@ local EggContents = {
     ["Night Egg"] = {"Hedgehog", "Kiwi", "Mole", "Echo Frog", "Night Owl"}
 }
 
-local function createESP(egg)
-    if not egg:IsA("BasePart") or egg:FindFirstChild("ESPLabel") then return end
+local function createESP(obj)
+    if obj:IsA("Part") and not obj:FindFirstChild("ESPLabel") then
+        local eggName = obj:GetAttribute("EggName") or (obj.Parent and obj.Parent:GetAttribute("EggName"))
+        if not eggName then return end
 
-    local eggName = egg:GetAttribute("EggName")
-    if not eggName then return end
+        local pets = EggContents[eggName]
+        if not pets then return end
 
-    local pets = EggContents[eggName]
-    if not pets then return end
+        local gui = Instance.new("BillboardGui", obj)
+        gui.Name = "ESPLabel"
+        gui.Adornee = obj
+        gui.Size = UDim2.new(0, 200, 0, 40)
+        gui.StudsOffset = Vector3.new(0, 2.5, 0)
+        gui.AlwaysOnTop = true
 
-    local gui = Instance.new("BillboardGui", egg)
-    gui.Name = "ESPLabel"
-    gui.Adornee = egg
-    gui.Size = UDim2.new(0, 200, 0, 40)
-    gui.StudsOffset = Vector3.new(0, 2.5, 0)
-    gui.AlwaysOnTop = true
+        local label = Instance.new("TextLabel", gui)
+        label.Size = UDim2.new(1, 0, 1, 0)
+        label.BackgroundTransparency = 1
+        label.TextColor3 = Color3.fromRGB(0, 255, 0)
+        label.TextScaled = true
+        label.Font = Enum.Font.SourceSansBold
+        label.Text = table.concat(pets, ", ")
 
-    local label = Instance.new("TextLabel", gui)
-    label.Size = UDim2.new(1, 0, 1, 0)
-    label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.fromRGB(0, 255, 0)
-    label.TextScaled = true
-    label.Font = Enum.Font.SourceSansBold
-    label.Text = table.concat(pets, ", ")
-
-    print("✅ ESP Loaded for:", eggName)
+        print("✅ ESP Loaded:", eggName)
+    end
 end
 
 local function removeESP()
@@ -45,6 +45,7 @@ local function removeESP()
     end
 end
 
+-- UI
 local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
 ScreenGui.Name = "DeadmarkESPUI"
 
