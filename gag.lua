@@ -24,7 +24,7 @@ title.Font = Enum.Font.SourceSansBold
 title.TextSize = 16
 
 -- Dropdown (manual input for now)
-local seedOptions = {"Tomato", "Carrot} -- Tambahkan seed sesuai kebutuhan
+local seedOptions = {"Tomato", "Carrot", "Lettuce", "Apple"} -- Tambahkan seed sesuai kebutuhan
 for i, seedName in ipairs(seedOptions) do
 	local button = Instance.new("TextButton", Frame)
 	button.Size = UDim2.new(1, -20, 0, 25)
