@@ -11,30 +11,43 @@ local EggContents = {
 }
 
 local function createESP(obj)
-    if obj:IsA("Part") and not obj:FindFirstChild("ESPLabel") then
-        local eggName = obj:GetAttribute("EggName") or (obj.Parent and obj.Parent:GetAttribute("EggName"))
-        if not eggName then return end
-
-        local pets = EggContents[eggName]
-        if not pets then return end
-
-        local gui = Instance.new("BillboardGui", obj)
-        gui.Name = "ESPLabel"
-        gui.Adornee = obj
-        gui.Size = UDim2.new(0, 200, 0, 40)
-        gui.StudsOffset = Vector3.new(0, 2.5, 0)
-        gui.AlwaysOnTop = true
-
-        local label = Instance.new("TextLabel", gui)
-        label.Size = UDim2.new(1, 0, 1, 0)
-        label.BackgroundTransparency = 1
-        label.TextColor3 = Color3.fromRGB(0, 255, 0)
-        label.TextScaled = true
-        label.Font = Enum.Font.SourceSansBold
-        label.Text = table.concat(pets, ", ")
-
-        print("✅ ESP Loaded:", eggName)
+    if not obj:IsA("Part") then return end
+    if obj:FindFirstChild("ESPLabel") then
+        print("[SKIP] ESP already exists for:", obj.Name)
+        return
     end
+
+    local eggName = obj:GetAttribute("EggName") or (obj.Parent and obj.Parent:GetAttribute("EggName"))
+
+    print("[CHECK] Object:", obj.Name, " | EggName:", eggName)
+
+    if not eggName then
+        print("[SKIP] No EggName attribute.")
+        return
+    end
+
+    local pets = EggContents[eggName]
+    if not pets then
+        print("[SKIP] Unknown egg type:", eggName)
+        return
+    end
+
+    print("[ESP] Creating for:", eggName)
+
+    local gui = Instance.new("BillboardGui", obj)
+    gui.Name = "ESPLabel"
+    gui.Adornee = obj
+    gui.Size = UDim2.new(0, 200, 0, 40)
+    gui.StudsOffset = Vector3.new(0, 2.5, 0)
+    gui.AlwaysOnTop = true
+
+    local label = Instance.new("TextLabel", gui)
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(0, 255, 0)
+    label.TextScaled = true
+    label.Font = Enum.Font.SourceSansBold
+    label.Text = table.concat(pets, ", ")
 end
 
 local function removeESP()
@@ -43,6 +56,7 @@ local function removeESP()
             v.ESPLabel:Destroy()
         end
     end
+    print("[ESP] All ESP removed.")
 end
 
 -- UI
@@ -82,6 +96,7 @@ DisableBtn.Font = Enum.Font.SourceSansBold
 DisableBtn.TextScaled = true
 
 EnableBtn.MouseButton1Click:Connect(function()
+    print("[UI] Enable clicked. Scanning workspace...")
     for _, egg in pairs(workspace:GetDescendants()) do
         createESP(egg)
     end
@@ -90,8 +105,8 @@ EnableBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
-DisableBtn.MouseButton1Click:Connect(removeESP)
+DisableBtn.MouseButton1Click:Connect(function()
+    removeESP()
+end)
 
-for _, egg in pairs(workspace:GetDescendants()) do
-    createESP(egg)
-end
+print("[LOADED] DEADMARK ESP UI Loaded")
