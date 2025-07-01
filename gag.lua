@@ -1,28 +1,37 @@
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+
+function CreateESP(part, petName)
+    local BillboardGui = Instance.new("BillboardGui")
+    BillboardGui.Adornee = part
+    BillboardGui.Size = UDim2.new(0, 200, 0, 50)
+    BillboardGui.StudsOffset = Vector3.new(0, 2, 0)
+    BillboardGui.AlwaysOnTop = true
+
+    local TextLabel = Instance.new("TextLabel", BillboardGui)
+    TextLabel.Size = UDim2.new(1, 0, 1, 0)
+    TextLabel.Text = petName
+    TextLabel.TextColor3 = Color3.new(1, 1, 0)
+    TextLabel.BackgroundTransparency = 1
+    TextLabel.TextScaled = true
+
+    BillboardGui.Parent = part
+end
+
 for _, egg in ipairs(workspace:GetDescendants()) do
     if egg:IsA("Model") and egg:GetAttribute("OBJECT_TYPE") == "PetEgg" then
         local owner = egg:GetAttribute("OWNER")
-        if owner == game.Players.LocalPlayer.Name then
-            print("====== Your Egg ======")
-            print("Egg Name: " .. (egg:GetAttribute("EggName") or "Unknown"))
+        if owner == localPlayer.Name then
+            local petName = nil
 
             for _, child in ipairs(egg:GetChildren()) do
-                if child:IsA("Model") then
-                    print("Model: " .. child.Name)
-                    for _, subModel in ipairs(child:GetChildren()) do
-                        if subModel:IsA("Model") then
-                            print(" + Sub-model: " .. subModel.Name)
-                        elseif subModel:IsA("Part") then
-                            print(" + Part: " .. subModel.Name)
-                        end
-                    end
-                elseif child:IsA("Part") then
-                    print("Part: " .. child.Name)
-                elseif child:IsA("ProximityPrompt") then
-                    print("Prompt: " .. child.Name)
+                if child:IsA("Model") and child.Name ~= egg.Name then
+                    -- Cari sub-model yang berbeda nama dari model utama (biasanya itu pet)
+                    petName = child.Name
+                    break
                 end
             end
 
-            print("======================")
-        end
-    end
-end
+            if petName and egg:FindFirstChild("PetEgg") then
+                CreateESP(egg.PetEgg, petName)
+                print("[ESP
