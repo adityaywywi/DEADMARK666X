@@ -1,13 +1,12 @@
 local supportedGames = {
-    [7436755782] = "https://raw.githubusercontent.com/adityaywywi/DEADMARK666X/main/gag.lua" -- Grow a Garden
+    [7436755782] = "https://raw.githubusercontent.com/adityaywywi/DEADMARK666X/main/gag.lua",
 }
 
 local gameNames = {
-    [7436755782] = "Grow a Garden"
+    [7436755782] = "Grow a Garden",
 }
 
 local gameId = game.GameId
-
 if supportedGames[gameId] then
     game.StarterGui:SetCore("SendNotification", {
         Title = "DEADMARK666X",
@@ -23,7 +22,7 @@ if supportedGames[gameId] then
     if success then
         loadstring(result)()
     else
-        warn("[DEADMARK666X] Failed to load script: " .. tostring(result))
+        warn("Failed to load script: " .. tostring(result))
     end
 else
     game.StarterGui:SetCore("SendNotification", {
