@@ -1,31 +1,29 @@
--- gag.lua
--- ✅ Loader utama untuk semua module di DEADMARK666X
+-- ✅ DEADMARK666X Script Entry Point (gag.lua)
 
--- Lokasi folder modules
-local MODULE_PATH = "Deadmark.Modules"
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local DeadmarkFolder = ReplicatedStorage:WaitForChild("DEADMARK666X")
+local Modules = DeadmarkFolder:WaitForChild("Modules")
 
--- Fungsi bantu untuk load module dengan aman
+-- Fungsi aman untuk require module
 local function safeRequire(moduleName)
-    local success, module = pcall(function()
-        return require(script:FindFirstChild(moduleName) or game:GetService("ReplicatedStorage"):WaitForChild(MODULE_PATH):WaitForChild(moduleName))
-    end)
-    if success then
-        task.spawn(module.run) -- pastikan module punya fungsi run()
-    else
-        warn("[GAG] Gagal memuat module:", moduleName, module)
-    end
+	local success, result = pcall(function()
+		return require(Modules:WaitForChild(moduleName))
+	end)
+	if not success then
+		warn("[DEADMARK] Gagal require:", moduleName, "|", result)
+	end
+	return result
 end
 
--- Daftar module yang ingin dijalankan
-local modules = {
-    "Autobuy", -- ✅ Modul auto-buy seed
-    "Ui",      -- ✅ Modul UI (jika ada UI terpisah)
-    -- Tambahkan lagi module jika perlu seperti "ESP", "AutoCollect", dll.
-}
-
--- Jalankan semua module
-for _, modName in ipairs(modules) do
-    safeRequire(modName)
+-- ✅ Load UI dan AutoBuy
+local ui = safeRequire("Ui")
+if ui then
+	pcall(ui.Show)
 end
 
-print("[GAG] Semua module dimuat")
+local autobuy = safeRequire("Autobuy")
+if autobuy then
+	pcall(autobuy.Start)
+end
+
+warn("[DEADMARK] ✅ gag.lua loaded successfully.")
