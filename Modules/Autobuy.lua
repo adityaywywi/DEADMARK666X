@@ -1,6 +1,8 @@
 -- ✅ modules/AutoBuy.lua -- Fungsi untuk auto-beli seed dari shop Grow a Garden
+local M = {}
 
-return function(config) local ReplicatedStorage = game:GetService("ReplicatedStorage")
+function M.run()
+ return function(config) local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local selectedSeeds = config.selectedSeeds or {}
 local interval = config.interval or 5
@@ -39,3 +41,7 @@ end)
 
 end
 
+
+end
+
+return M
